@@ -1,0 +1,13 @@
+port: 8080
+api_keys:
+  - "testkey-abc123"
+routes:
+  /openai:
+    target: https://api.openai.com/v1/
+    api_key_required: true
+    rate_limit: 60 # requests per minute
+    cors: true
+  /weather:
+    target: https://api.weather.com/v2/
+    api_key_required: false
+    rate_limit: 10
