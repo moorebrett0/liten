@@ -10,11 +10,11 @@
 
 **Liten** (“small” in Nordic languages) is a lightweight, config-driven API gateway you can run anywhere—your laptop, Raspberry Pi, cloud VM, or dev server.
 
-* 🔑 **API key authentication**
-* ⚡ **Per-route rate limiting**
-* 🌐 **Reverse proxy to any backend API**
-* 📜 **Request/response logging**
-* 🧑‍💻 **Interactive CLI shell**
+*  **API key authentication**
+*  **Per-route rate limiting**
+*  **Reverse proxy to any backend API**
+*  **Request/response logging**
+*  **Interactive CLI shell**
 
 > **Liten is perfect for solo devs, hobbyists, educators, or anyone who needs simple, local API security and observability.**
 
@@ -182,10 +182,10 @@ routes:
 ## Contribution
 
 PRs and issues welcome!
-Please file bugs, feature requests, and suggestions on [GitHub Issues](https://github.com/yourusername/liten/issues).
+Please file bugs, feature requests, and suggestions on [GitHub Issues](https://github.com/moorebrett0/liten/issues).
 
 ---
 
 ## License
 
-MIT License © [Your Name](https://github.com/yourusername)
+MIT License © [Brett Moore](https://github.com/moorebrett0)
