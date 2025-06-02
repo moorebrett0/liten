@@ -8,7 +8,7 @@
 
 ## What is Liten?
 
-**Liten** (“small” in Nordic languages) is a lightweight, config-driven API gateway you can run anywhere—your laptop, Raspberry Pi, cloud VM, or dev server.
+**Liten** (“small” in Nordic languages) is a lightweight, config-driven API gateway you can run anywhere: your laptop, Raspberry Pi, cloud VM, or dev server.
 
 *  **API key authentication**
 *  **Per-route rate limiting**
