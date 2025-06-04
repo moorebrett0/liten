@@ -25,7 +25,7 @@
 1. **Install:**
 
    ```sh
-   npm install -g liten
+   npm install -g liten-gateway
    ```
 
 2. **Set up your `config.yaml`:**
@@ -74,6 +74,7 @@
 * **Interactive CLI shell (one terminal for all management)**
 * **Simple YAML/JSON config**
 * **Runs anywhere Node.js does**
+* **Domain based routing** (new in 1.1.0)
 
 ---
 
@@ -85,6 +86,10 @@ Inside the Liten shell:
 * `list-keys` — List all API keys
 * `add-key <key>` — Add an API key
 * `remove-key <key>` — Remove an API key
+* `add-domain <host> <target>`  - Add a new domain route
+* `remove-domain <host>` - Remove a domain route
+* `list-domains` - List all configured domains
+* `show-domain <host>` - Show the target for a specific domain
 * `logs [n]` — Show the last n log lines (default: 10)
 * `reload` — Reload config file
 * `help` — Show all commands
@@ -126,6 +131,64 @@ routes:
 ```
 
 This allows requests from any origin to that route.
+
+---
+
+## 🚦 Domain-Based Routing
+
+**New in v1.1.0:**
+`liten` now supports domain-based routing, making it easy to route requests by hostname or subdomain—just like a lightweight alternative to nginx for simple projects!
+
+### How Domain Routing Works
+
+You can define domain proxies that route incoming requests based on the `Host` header. These rules take priority over regular path routes.
+
+#### Programmatic Example
+
+```js
+const { startGateway } = require('./gateway');
+const gw = startGateway();
+
+// Add a domain route
+gw.addDomain('api.myapp.local', 'http://localhost:4001');
+gw.addDomain('admin.myapp.local', 'http://localhost:4002');
+
+// Optional: set a fallback for unmatched domains
+gw.addDomain('*', 'http://localhost:3000');
+
+// Remove a domain route
+gw.removeDomain('admin.myapp.local');
+
+// List all domains
+console.log(gw.listDomains());
+```
+
+### Interactive Shell Commands
+
+You can also manage domains directly from the interactive shell:
+
+**Examples:**
+
+```
+Liten > add-domain api.localhost http://localhost:3001
+Liten > add-domain '*' http://localhost:3000
+Liten > list-domains
+api.localhost -> http://localhost:3001
+*            -> http://localhost:3000
+Liten > remove-domain api.localhost
+```
+
+### How It Works
+
+* If a request matches a configured domain (by `Host` header), it is proxied to the specified target.
+* If no domain matches, the gateway will fall back to path-based routing as defined in your config file.
+* You can add, remove, and list domains live without restarting the gateway!
+
+---
+
+**Pro Tip:**
+Combine domain and path routing for maximum flexibility—run multiple microservices, dev APIs, or frontends from a single gateway, using simple interactive commands or code!
+
 
 ---
 
