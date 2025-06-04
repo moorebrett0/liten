@@ -1,6 +1,6 @@
 {
-  "name": "liten",
-  "version": "1.0.0",
+  "name": "liten-gateway",
+  "version": "1.0.1",
   "main": "index.js",
   "directories": {
     "lib": "lib"
@@ -11,9 +11,17 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moorebrett0/liten.git"
+  },
+  "bugs": {
+    "url": "https://github.com/moorebrett0/liten/issues"
+  },
+  "homepage": "https://github.com/moorebrett0/liten#readme",
+  "author": "moorebrett0",
   "license": "ISC",
-  "description": "",
+  "description": "A tiny, developer-friendly API gateway CLI for local dev, IoT, and side projects. Features API key auth, per-route rate limiting, logging, CORS, and an interactive shell - all in a single npm install.",
   "dependencies": {
     "commander": "^14.0.0",
     "express": "^5.1.0",

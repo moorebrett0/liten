@@ -31,6 +31,10 @@ Commands:
   list-keys               List all API keys
   add-key <key>           Add an API key
   remove-key <key>        Remove an API key
+  add-domain <d> <tgt>    Add a domain route (host target)
+  remove-domain <d>       Remove a domain route
+  list-domains            List all domain routes
+  show-domain <d>         Show domain route details
   logs [n]                Show the last n log lines (default 10)
   reload                  Reload config file
   exit / quit             Exit the gateway
@@ -38,6 +42,29 @@ Commands:
                 break;
             case 'status':
                 console.log(getStatus());
+                break;
+            case 'add-domain':
+                if (args.length < 2) return console.log('Usage: add-domain <domain> <target>');
+                gateway.addDomain(args[0], args[1]);
+                console.log(`Domain "${args[0]}" -> ${args[1]} added.`);
+                break;
+            case 'remove-domain':
+                if (!args[0]) return console.log('Usage: remove-domain <domain>');
+                gateway.removeDomain(args[0]);
+                console.log(`Domain "${args[0]}" removed.`);
+                break;
+            case 'list-domains':
+                const domains = gateway.listDomains();
+                if (!domains.length) return console.log('No domains configured.');
+                domains.forEach(([domain, cfg]) => {
+                    console.log(`${domain} -> ${cfg.target}`);
+                });
+                break;
+            case 'show-domain':
+                if (!args[0]) return console.log('Usage: show-domain <domain>');
+                const d = gateway.showDomain(args[0]);
+                if (!d) return console.log('Not found.');
+                console.log(`${args[0]} -> ${d.target}`);
                 break;
             case 'list-keys':
                 listKeys().forEach(k => console.log(k));
