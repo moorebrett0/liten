@@ -7,7 +7,7 @@ const readline = require('readline');
 // --- 1. Interactive shell ---
 
 function launchShell() {
-    startGateway(); // Launch gateway in background
+    startGateway();
 
     const rl = readline.createInterface({
         input: process.stdin,
