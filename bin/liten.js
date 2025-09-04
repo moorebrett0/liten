@@ -7,7 +7,7 @@ const readline = require('readline');
 // --- 1. Interactive shell ---
 
 function launchShell() {
-    startGateway();
+    const gateway = startGateway();
 
     const rl = readline.createInterface({
         input: process.stdin,
@@ -41,7 +41,12 @@ Commands:
         `);
                 break;
             case 'status':
-                console.log(getStatus());
+                const status = getStatus();
+                console.log(`Gateway Status:
+Port: ${status.port}
+Domain Count: ${status.domainCount}
+Route Count: ${status.routeCount}
+Uptime: ${status.uptime}`);
                 break;
             case 'add-domain':
                 if (args.length < 2) return console.log('Usage: add-domain <domain> <target>');

@@ -1,6 +1,5 @@
 port: 8080
 api_keys:
-  - "testkey-abc123"
 routes:
   /openai:
     target: https://api.openai.com/v1/

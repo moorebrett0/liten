@@ -242,10 +242,78 @@ routes:
 
 ---
 
-## Contribution
+## Contributing
 
-PRs and issues welcome!
+We welcome contributions! Here's how to get started:
+
+### Development Setup
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/moorebrett0/liten.git
+   cd liten
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Run tests:**
+   ```bash
+   npm test
+   ```
+
+### Testing
+
+Liten includes comprehensive tests to ensure reliability:
+
+- **Unit Tests**: Test individual components and functions
+- **Integration Tests**: Test the full gateway functionality including API key auth, rate limiting, CORS, and domain routing
+- **CLI Tests**: Test the interactive shell commands
+
+**Test Commands:**
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode (for development)
+npm run test:watch
+
+# Run tests with coverage report
+npm run test:coverage
+```
+
+**Test Structure:**
+- `bin/__tests__/` - CLI and shell command tests
+- `lib/__tests__/` - Core gateway functionality tests
+- Tests use Jest and Supertest for HTTP testing
+- All tests include proper cleanup to prevent memory leaks
+
+### Before Submitting a PR
+
+1. **Run the test suite** - All tests must pass
+2. **Add tests** for new features or bug fixes
+3. **Follow existing code style** - We use standard JavaScript conventions
+4. **Update documentation** if you're adding/changing features
+
+### What We're Looking For
+
+- Bug fixes with accompanying tests
+- New features that enhance the gateway's capabilities
+- Performance improvements
+- Documentation improvements
+- Better error handling
+
+### Reporting Issues
+
 Please file bugs, feature requests, and suggestions on [GitHub Issues](https://github.com/moorebrett0/liten/issues).
+
+When reporting bugs, please include:
+- Node.js version
+- Operating system
+- Steps to reproduce
+- Expected vs actual behavior
 
 ---
 
