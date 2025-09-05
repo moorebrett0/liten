@@ -1,6 +1,6 @@
 {
   "name": "liten-gateway",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "main": "index.js",
   "directories": {
     "lib": "lib"
@@ -31,6 +31,7 @@
   "license": "ISC",
   "description": "A tiny, developer-friendly API gateway CLI for local dev, IoT, and side projects. Features API key auth, per-route rate limiting, logging, CORS, and an interactive shell - all in a single npm install.",
   "dependencies": {
+    "@ngrok/ngrok": "^1.5.2",
     "commander": "^14.0.0",
     "express": "^5.1.0",
     "express-rate-limit": "^7.5.0",

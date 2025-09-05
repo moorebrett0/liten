@@ -75,6 +75,7 @@
 * **Simple YAML/JSON config**
 * **Runs anywhere Node.js does**
 * **Domain based routing** (new in 1.1.0)
+* **ngrok integration** for instant public tunnels (new in 1.2.0)
 
 ---
 
@@ -90,6 +91,9 @@ Inside the Liten shell:
 * `remove-domain <host>` - Remove a domain route
 * `list-domains` - List all configured domains
 * `show-domain <host>` - Show the target for a specific domain
+* `start-tunnel [opts]` — Start ngrok tunnel (see ngrok section for options)
+* `stop-tunnel` — Stop ngrok tunnel
+* `tunnel-status` — Show tunnel status
 * `logs [n]` — Show the last n log lines (default: 10)
 * `reload` — Reload config file
 * `help` — Show all commands
@@ -189,6 +193,119 @@ Liten > remove-domain api.localhost
 **Pro Tip:**
 Combine domain and path routing for maximum flexibility—run multiple microservices, dev APIs, or frontends from a single gateway, using simple interactive commands or code!
 
+---
+
+## 🌐 ngrok Integration
+
+**New in v1.2.0:**
+Liten now includes built-in ngrok integration, making it incredibly easy to expose your local gateway to the internet with a single command. Perfect for sharing demos, webhooks, testing with external services, or remote development.
+
+### Quick Start with ngrok
+
+1. **Get your ngrok authtoken:**
+   - Sign up at: https://dashboard.ngrok.com/signup
+   - Get your authtoken: https://dashboard.ngrok.com/get-started/your-authtoken
+
+2. **Start your gateway:**
+   ```sh
+   liten
+   ```
+
+3. **Create a public tunnel:**
+   ```sh
+   Liten > start-tunnel --authtoken=your_authtoken_here
+   ✅ Tunnel started successfully!
+   🌐 Public URL: https://abc123.ngrok.app
+   📍 Local: localhost:8080
+   ```
+
+4. **Your API is now publicly accessible!**
+   - All your configured routes work through the tunnel
+   - API keys, rate limiting, and CORS all work as expected
+   - Share the ngrok URL with anyone
+
+### ngrok Commands
+
+* **`start-tunnel [options]`** - Start an ngrok tunnel
+  - `--authtoken=<token>` - Use your ngrok authtoken
+  - `--domain=<domain>` - Use a custom/reserved domain
+  - `--subdomain=<name>` - Request a specific subdomain
+  - `--region=<region>` - Choose region (us, eu, ap, au, sa, jp, in)
+
+* **`stop-tunnel`** - Stop the current tunnel
+
+* **`tunnel-status`** - Show tunnel details and uptime
+
+### Authtoken Setup
+
+You can provide your ngrok authtoken in several ways:
+
+**Method 1: Command line option**
+```sh
+Liten > start-tunnel --authtoken=your_authtoken_here
+```
+
+**Method 2: Environment variable**
+```sh
+export NGROK_AUTHTOKEN=your_authtoken_here
+liten
+Liten > start-tunnel  # Will use the environment variable
+```
+
+**Method 3: Config file**
+```yaml
+ngrok:
+  authtoken: your_authtoken_here
+```
+
+### Examples
+
+**Basic tunnel (with authtoken in environment or config):**
+```sh
+Liten > start-tunnel
+```
+
+**With custom domain (requires ngrok Pro):**
+```sh
+Liten > start-tunnel --domain=myapi.ngrok.app
+```
+
+**With authtoken and region:**
+```sh
+Liten > start-tunnel --authtoken=your_token --region=eu
+```
+
+### Auto-start Tunnels
+
+You can configure Liten to automatically start an ngrok tunnel when the gateway starts by editing your `config.yaml`:
+
+```yaml
+port: 8080
+ngrok:
+  auto_start: true
+  authtoken: your_ngrok_authtoken  # optional
+  domain: myapi.ngrok.app         # optional
+  region: us                      # optional
+routes:
+  # ... your routes
+```
+
+With `auto_start: true`, Liten will automatically create a public tunnel every time you start the gateway.
+
+### Use Cases
+
+* **Demo your API** - Share your work instantly with clients or team members
+* **Webhook development** - Test webhooks from external services like GitHub, Stripe, etc.
+* **Mobile app testing** - Test your local API from mobile devices
+* **Remote development** - Access your local gateway from anywhere
+* **Quick prototyping** - Share prototypes without deploying
+
+### Security Notes
+
+* ngrok tunnels are public by default - anyone with the URL can access your API
+* Use API key authentication for secure endpoints
+* Consider using custom domains for professional presentations
+* Monitor tunnel activity through the `tunnel-status` command
 
 ---
 

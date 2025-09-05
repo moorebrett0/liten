@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const { startGateway, getStatus, getLogs, reloadConfig } = require('../lib/gateway');
 const { addKey, removeKey, listKeys } = require('../lib/keys');
-const program = require('commander');
+const { startTunnel, stopTunnel, getTunnelStatus, isTunnelActive } = require('../lib/ngrok');
 const readline = require('readline');
 
 // --- 1. Interactive shell ---
@@ -19,7 +19,7 @@ function launchShell() {
     console.log('Type "help" for a list of commands.\n');
     rl.prompt();
 
-    rl.on('line', (line) => {
+    rl.on('line', async (line) => {
         const input = line.trim();
         const [cmd, ...args] = input.split(' ');
 
@@ -35,6 +35,9 @@ Commands:
   remove-domain <d>       Remove a domain route
   list-domains            List all domain routes
   show-domain <d>         Show domain route details
+  start-tunnel [opts]     Start ngrok tunnel (opts: --authtoken=<token> --domain=<domain> --region=<region>)
+  stop-tunnel             Stop ngrok tunnel
+  tunnel-status           Show tunnel status
   logs [n]                Show the last n log lines (default 10)
   reload                  Reload config file
   exit / quit             Exit the gateway
@@ -46,7 +49,8 @@ Commands:
 Port: ${status.port}
 Domain Count: ${status.domainCount}
 Route Count: ${status.routeCount}
-Uptime: ${status.uptime}`);
+Uptime: ${status.uptime}
+Tunnel: ${status.tunnel.active ? `🟢 Active (${status.tunnel.url})` : '🔴 Inactive'}`);
                 break;
             case 'add-domain':
                 if (args.length < 2) return console.log('Usage: add-domain <domain> <target>');
@@ -86,6 +90,75 @@ Uptime: ${status.uptime}`);
                 const n = parseInt(args[0]) || 10;
                 getLogs(n).forEach(line => console.log(line));
                 break;
+            case 'start-tunnel':
+                try {
+                    if (isTunnelActive()) {
+                        console.log('Tunnel is already running. Use "tunnel-status" to see details or "stop-tunnel" to stop it.');
+                        break;
+                    }
+                    
+                    // Parse options from args
+                    const options = {};
+                    args.forEach(arg => {
+                        if (arg.startsWith('--authtoken=')) {
+                            options.authtoken = arg.split('=')[1];
+                        } else if (arg.startsWith('--domain=')) {
+                            options.domain = arg.split('=')[1];
+                        } else if (arg.startsWith('--subdomain=')) {
+                            options.subdomain = arg.split('=')[1];
+                        } else if (arg.startsWith('--region=')) {
+                            options.region = arg.split('=')[1];
+                        }
+                    });
+                    
+                    const gatewayStatus = getStatus();
+                    const tunnelInfo = await startTunnel(gatewayStatus.port, options);
+                    console.log(`✅ Tunnel started successfully!`);
+                    console.log(`🌐 Public URL: ${tunnelInfo.url}`);
+                    console.log(`📍 Local: localhost:${tunnelInfo.port}`);
+                } catch (error) {
+                    if (error.message.includes('ERR_NGROK_4018') || error.message.includes('authtoken')) {
+                        console.log(`❌ ngrok requires authentication to start tunnels.`);
+                        console.log(`📝 To fix this:`);
+                        console.log(`   1. Sign up: https://dashboard.ngrok.com/signup`);
+                        console.log(`   2. Get your authtoken: https://dashboard.ngrok.com/get-started/your-authtoken`);
+                        console.log(`   3. Use: start-tunnel --authtoken=your_token`);
+                        console.log(`   4. Or add to config.yaml under 'ngrok: authtoken: your_token'`);
+                    } else {
+                        console.log(`❌ Failed to start tunnel: ${error.message}`);
+                    }
+                }
+                break;
+            case 'stop-tunnel':
+                try {
+                    const stopped = await stopTunnel();
+                    if (stopped) {
+                        console.log('✅ Tunnel stopped successfully.');
+                    } else {
+                        console.log('ℹ️  No tunnel was running.');
+                    }
+                } catch (error) {
+                    console.log(`❌ Failed to stop tunnel: ${error.message}`);
+                }
+                break;
+            case 'tunnel-status':
+                const tunnelStatus = getTunnelStatus();
+                if (tunnelStatus) {
+                    console.log(`Tunnel Status:
+🌐 URL: ${tunnelStatus.url}
+📍 Port: ${tunnelStatus.port}
+⏱️  Uptime: ${tunnelStatus.uptime}
+🕐 Started: ${tunnelStatus.startTime.toISOString()}`);
+                    if (tunnelStatus.options.domain) {
+                        console.log(`🏷️  Domain: ${tunnelStatus.options.domain}`);
+                    }
+                    if (tunnelStatus.options.region) {
+                        console.log(`🌍 Region: ${tunnelStatus.options.region}`);
+                    }
+                } else {
+                    console.log('ℹ️  No tunnel is currently running.');
+                }
+                break;
             case 'reload':
                 reloadConfig();
                 console.log('Config reloaded.');
@@ -111,9 +184,6 @@ Uptime: ${status.uptime}`);
 }
 
 
-if (process.argv.length <= 2) {
-    launchShell();
-} else {
-    program.parse(process.argv);
-}
+// Always launch the interactive shell
+launchShell();
 
