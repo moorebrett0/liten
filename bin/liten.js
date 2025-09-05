@@ -158,8 +158,7 @@ Tunnel: ${status.tunnel.active ? `🟢 Active (${status.tunnel.url})` : '🔴 In
                 } else {
                     console.log('ℹ️  No tunnel is currently running.');
                 }
-                break;
-            case 'reload':
+                break;         case 'reload':
                 reloadConfig();
                 console.log('Config reloaded.');
                 break;
