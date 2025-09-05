@@ -12,7 +12,8 @@
     "bin/liten.js",
     "lib/*.js",
     "README.md",
-    "config.yaml"
+    "config.yaml",
+    "assets/"
   ],
   "scripts": {
     "test": "jest",

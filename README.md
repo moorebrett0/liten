@@ -1,6 +1,8 @@
-# Liten
-
-**A tiny, developer-friendly API gateway CLI for local dev, IoT, and small teams.**
+<div align="center">
+  <img src="assets/liten-logo.png" alt="Liten" width="300">
+  
+  **A tiny, developer-friendly API gateway CLI for local dev, IoT, and small teams.**
+</div>
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
