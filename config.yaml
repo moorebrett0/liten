@@ -1,5 +1,13 @@
 port: 8080
 api_keys:
+ngrok:
+  # Set to true to automatically start ngrok tunnel when gateway starts
+  auto_start: false
+  # Optional ngrok configuration
+  # authtoken: your_ngrok_authtoken
+  # domain: your-custom-domain.ngrok.app
+  # subdomain: myapp
+  # region: us
 routes:
   /openai:
     target: https://api.openai.com/v1/
