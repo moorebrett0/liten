@@ -18,3 +18,8 @@ routes:
     target: https://api.weather.com/v2/
     api_key_required: false
     rate_limit: 10
+  # Example WebSocket route
+  /ws-echo:
+    target: ws://localhost:9001/
+    api_key_required: true
+    ws: true
