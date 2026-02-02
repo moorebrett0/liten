@@ -77,13 +77,13 @@ describe('Liten CLI', () => {
     it('should handle status command', async () => {
       const cli = spawn('node', [cliPath], { stdio: ['pipe', 'pipe', 'pipe'] });
       runningProcesses.push(cli);
-      
+
       await waitForPrompt(cli);
       cli.stdin.write('status\n');
-      
+
       const output = await waitForOutput(cli, 'Port:');
-      expect(output).toContain('Domain Count:');
-      expect(output).toContain('Route Count:');
+      expect(output).toContain('Domains:');
+      expect(output).toContain('Routes:');
       cli.kill();
     });
 

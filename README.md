@@ -78,6 +78,7 @@
 * **Runs anywhere Node.js does**
 * **Domain based routing** (new in 1.1.0)
 * **ngrok integration** for instant public tunnels (new in 1.2.0)
+* **WebSocket proxying** with authentication (new in 1.3.0)
 
 ---
 
@@ -89,7 +90,7 @@ Inside the Liten shell:
 * `list-keys` — List all API keys
 * `add-key <key>` — Add an API key
 * `remove-key <key>` — Remove an API key
-* `add-domain <host> <target>`  - Add a new domain route
+* `add-domain <host> <target> [--ws] [--no-auth]` - Add a domain route (with optional WebSocket and auth flags)
 * `remove-domain <host>` - Remove a domain route
 * `list-domains` - List all configured domains
 * `show-domain <host>` - Show the target for a specific domain
@@ -308,6 +309,85 @@ With `auto_start: true`, Liten will automatically create a public tunnel every t
 * Use API key authentication for secure endpoints
 * Consider using custom domains for professional presentations
 * Monitor tunnel activity through the `tunnel-status` command
+
+---
+
+## WebSocket Proxying
+
+**New in v1.3.0:**
+Liten now supports WebSocket proxying, allowing you to route WebSocket connections through the gateway with full authentication support.
+
+### Configuration
+
+Enable WebSocket support on any route by adding `ws: true`:
+
+```yaml
+routes:
+  /ws-chat:
+    target: ws://localhost:3001/
+    api_key_required: true
+    ws: true
+
+  /ws-public:
+    target: ws://localhost:3002/
+    api_key_required: false
+    ws: true
+```
+
+### Connecting to WebSocket Routes
+
+**With API key in query parameter:**
+```bash
+wscat -c 'ws://localhost:8080/ws-chat?key=your_api_key'
+```
+
+**With API key in header (programmatic):**
+```javascript
+const ws = new WebSocket('ws://localhost:8080/ws-chat', {
+  headers: { 'x-api-key': 'your_api_key' }
+});
+```
+
+### Domain-Based WebSocket Routes
+
+You can also add WebSocket-enabled domain routes via the CLI:
+
+```
+Liten > add-domain ws.myapp.local ws://localhost:4000 --ws
+Domain "ws.myapp.local" -> ws://localhost:4000 added. (WebSocket)
+
+Liten > add-domain public.myapp.local ws://localhost:4001 --ws --no-auth
+Domain "public.myapp.local" -> ws://localhost:4001 added. (WebSocket, no auth)
+```
+
+### Status Display
+
+The status command now shows WebSocket route counts:
+
+```
+Liten > status
+Gateway Status:
+Port: 8080
+Routes: 3 (1 WebSocket)
+Domains: 2 (1 WebSocket)
+Uptime: 120s
+Tunnel: Inactive
+```
+
+### Use Cases
+
+* **Real-time chat applications** - Proxy chat WebSocket connections with authentication
+* **Live dashboards** - Secure WebSocket feeds for real-time data
+* **IoT devices** - Route sensor data through authenticated WebSocket connections
+* **Game servers** - Proxy game state WebSocket connections
+* **Collaborative tools** - Real-time collaboration with secure WebSocket proxying
+
+### How It Works
+
+* WebSocket upgrade requests are intercepted at the HTTP server level
+* Authentication happens during the upgrade handshake (before connection is established)
+* Once authenticated, the WebSocket connection is proxied transparently
+* All existing features (logging, domain routing) work with WebSocket connections
 
 ---
 

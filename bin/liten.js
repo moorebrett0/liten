@@ -31,7 +31,7 @@ Commands:
   list-keys               List all API keys
   add-key <key>           Add an API key
   remove-key <key>        Remove an API key
-  add-domain <d> <tgt>    Add a domain route (host target)
+  add-domain <d> <tgt> [opts]  Add a domain route (opts: --ws --no-auth)
   remove-domain <d>       Remove a domain route
   list-domains            List all domain routes
   show-domain <d>         Show domain route details
@@ -47,15 +47,22 @@ Commands:
                 const status = getStatus();
                 console.log(`Gateway Status:
 Port: ${status.port}
-Domain Count: ${status.domainCount}
-Route Count: ${status.routeCount}
+Routes: ${status.routeCount} (${status.wsRouteCount} WebSocket)
+Domains: ${status.domainCount} (${status.wsDomainCount} WebSocket)
 Uptime: ${status.uptime}
-Tunnel: ${status.tunnel.active ? `🟢 Active (${status.tunnel.url})` : '🔴 Inactive'}`);
+Tunnel: ${status.tunnel.active ? `Active (${status.tunnel.url})` : 'Inactive'}`);
                 break;
             case 'add-domain':
-                if (args.length < 2) return console.log('Usage: add-domain <domain> <target>');
-                gateway.addDomain(args[0], args[1]);
-                console.log(`Domain "${args[0]}" -> ${args[1]} added.`);
+                if (args.length < 2) return console.log('Usage: add-domain <domain> <target> [--ws] [--no-auth]');
+                const domainOpts = {
+                    ws: args.includes('--ws'),
+                    api_key_required: !args.includes('--no-auth')
+                };
+                gateway.addDomain(args[0], args[1], domainOpts);
+                const flags = [];
+                if (domainOpts.ws) flags.push('WebSocket');
+                if (!domainOpts.api_key_required) flags.push('no auth');
+                console.log(`Domain "${args[0]}" -> ${args[1]} added.${flags.length ? ` (${flags.join(', ')})` : ''}`);
                 break;
             case 'remove-domain':
                 if (!args[0]) return console.log('Usage: remove-domain <domain>');
@@ -66,14 +73,21 @@ Tunnel: ${status.tunnel.active ? `🟢 Active (${status.tunnel.url})` : '🔴 In
                 const domains = gateway.listDomains();
                 if (!domains.length) return console.log('No domains configured.');
                 domains.forEach(([domain, cfg]) => {
-                    console.log(`${domain} -> ${cfg.target}`);
+                    const domainFlags = [];
+                    if (cfg.ws) domainFlags.push('ws');
+                    if (cfg.api_key_required === false) domainFlags.push('no-auth');
+                    const flagStr = domainFlags.length ? ` [${domainFlags.join(', ')}]` : '';
+                    console.log(`${domain} -> ${cfg.target}${flagStr}`);
                 });
                 break;
             case 'show-domain':
                 if (!args[0]) return console.log('Usage: show-domain <domain>');
                 const d = gateway.showDomain(args[0]);
                 if (!d) return console.log('Not found.');
-                console.log(`${args[0]} -> ${d.target}`);
+                console.log(`Domain: ${args[0]}`);
+                console.log(`Target: ${d.target}`);
+                console.log(`WebSocket: ${d.ws ? 'enabled' : 'disabled'}`);
+                console.log(`API Key Required: ${d.api_key_required !== false ? 'yes' : 'no'}`);
                 break;
             case 'list-keys':
                 listKeys().forEach(k => console.log(k));
