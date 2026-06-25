@@ -53,15 +53,18 @@ Uptime: ${status.uptime}
 Tunnel: ${status.tunnel.active ? `Active (${status.tunnel.url})` : 'Inactive'}`);
                 break;
             case 'add-domain':
-                if (args.length < 2) return console.log('Usage: add-domain <domain> <target> [--ws] [--no-auth]');
+                if (args.length < 2) return console.log('Usage: add-domain <domain> <target> [--ws] [--no-auth] [--rate-limit=N]');
+                const rateLimitArg = args.find(a => a.startsWith('--rate-limit='));
                 const domainOpts = {
                     ws: args.includes('--ws'),
-                    api_key_required: !args.includes('--no-auth')
+                    api_key_required: !args.includes('--no-auth'),
+                    ...(rateLimitArg ? { rate_limit: parseInt(rateLimitArg.split('=')[1], 10) } : {})
                 };
                 gateway.addDomain(args[0], args[1], domainOpts);
                 const flags = [];
                 if (domainOpts.ws) flags.push('WebSocket');
                 if (!domainOpts.api_key_required) flags.push('no auth');
+                if (domainOpts.rate_limit) flags.push(`${domainOpts.rate_limit}/min`);
                 console.log(`Domain "${args[0]}" -> ${args[1]} added.${flags.length ? ` (${flags.join(', ')})` : ''}`);
                 break;
             case 'remove-domain':
@@ -172,7 +175,8 @@ Tunnel: ${status.tunnel.active ? `Active (${status.tunnel.url})` : 'Inactive'}`)
                 } else {
                     console.log('ℹ️  No tunnel is currently running.');
                 }
-                break;         case 'reload':
+                break;
+            case 'reload':
                 reloadConfig();
                 console.log('Config reloaded.');
                 break;
