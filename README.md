@@ -439,6 +439,30 @@ routes:
 * Logs are written to `gateway.log` in your project directory.
 * View logs with `logs 20` in the shell, or tail with `tail -f gateway.log`.
 
+### Structured logs (JSONL)
+
+Opt in by setting `log_format: jsonl` at the top of `config.yaml`. Liten will
+continue writing `gateway.log` unchanged and, in parallel, append one JSON
+record per completed HTTP request to `gateway.jsonl`. This is the format
+consumed by [liten-brain](https://github.com/moorebrett0/liten-brain) for
+model training.
+
+```yaml
+log_format: jsonl   # opt-in. Default is `text` (no jsonl file emitted).
+```
+
+Each record conforms to `schemas/log-record.v1.json` and includes fields like
+`ts`, `id`, `method`, `path`, `route_key`, `matched_by`, `target`, `status`,
+`latency_ms`, `req_bytes`, `res_bytes`, `ua_family`, `client_ip_bucket`,
+`hour_of_day`, `day_of_week`, and `outcome` (`ok` / `slow` / `error` /
+`throttled`). API keys are hashed (`sha256:<hex>`), raw client IPs are
+bucketed to `/24` (IPv4) or `/48` (IPv6), and sensitive query keys
+(`api_key`, `token`, etc.) are redacted from `path`. WebSocket upgrades and
+unrouted 404s are intentionally not emitted.
+
+Liten does not rotate the JSONL file — use `logrotate` with `copytruncate`
+if you need rotation.
+
 ---
 
 ## Contributing

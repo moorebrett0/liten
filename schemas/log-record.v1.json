@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://liten.dev/schemas/log-record/v1.json",
+  "title": "liten log record",
+  "description": "One completed HTTP request through the liten gateway. Frozen at v1.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "ts",
+    "id",
+    "method",
+    "path",
+    "route_key",
+    "matched_by",
+    "target",
+    "status",
+    "latency_ms",
+    "outcome"
+  ],
+  "properties": {
+    "ts": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 UTC at response finish. Millisecond precision."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^req_[0-9A-HJKMNP-TV-Z]{26}$",
+      "description": "26-char Crockford base32 ULID with req_ prefix."
+    },
+    "method": {
+      "type": "string",
+      "minLength": 1
+    },
+    "path": {
+      "type": "string",
+      "description": "req.originalUrl with query string retained; sensitive query values redacted."
+    },
+    "host": {
+      "type": ["string", "null"]
+    },
+    "route_key": {
+      "type": "string",
+      "description": "Path route config key (e.g. /openai) or matched domain name."
+    },
+    "matched_by": {
+      "type": "string",
+      "enum": ["path", "domain"]
+    },
+    "target": {
+      "type": "string",
+      "description": "Resolved upstream URL."
+    },
+    "api_key_hash": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[0-9a-f]{32,}$"
+    },
+    "status": {
+      "type": "integer",
+      "minimum": 100,
+      "maximum": 599
+    },
+    "latency_ms": {
+      "type": "number",
+      "minimum": 0
+    },
+    "req_bytes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "res_bytes": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "ua_family": {
+      "type": "string",
+      "enum": [
+        "curl",
+        "python-requests",
+        "node",
+        "chrome",
+        "firefox",
+        "safari",
+        "other"
+      ]
+    },
+    "client_ip_bucket": {
+      "type": ["string", "null"],
+      "description": "/24 (IPv4) or /48 (IPv6) prefix. Never the raw IP."
+    },
+    "hour_of_day": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 23
+    },
+    "day_of_week": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 6,
+      "description": "ISO weekday, Monday=0 through Sunday=6."
+    },
+    "outcome": {
+      "type": "string",
+      "enum": ["ok", "slow", "error", "throttled"]
+    }
+  }
+}
