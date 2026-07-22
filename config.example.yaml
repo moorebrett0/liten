@@ -1,0 +1,31 @@
+port: 8080
+
+# text  = human-readable gateway.log only (default)
+# jsonl = write gateway.log AND a structured gateway.jsonl (one JSON record
+#         per completed HTTP request). Enable if you plan to feed traffic to
+#         liten-brain or another analytics/ML pipeline.
+log_format: text
+
+api_keys:
+
+ngrok:
+  auto_start: false
+  # authtoken: your_ngrok_authtoken
+  # domain: your-custom-domain.ngrok.app
+  # subdomain: myapp
+  # region: us
+
+routes:
+  /openai:
+    target: https://api.openai.com/v1/
+    api_key_required: true
+    rate_limit: 60
+    cors: true
+  /weather:
+    target: https://api.weather.com/v2/
+    api_key_required: false
+    rate_limit: 10
+  /ws-echo:
+    target: ws://localhost:9001/
+    api_key_required: true
+    ws: true
